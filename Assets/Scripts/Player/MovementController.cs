@@ -16,7 +16,6 @@ public class MovementController : MonoBehaviour
     private float xRotation = 0f;
     public float gravity = -9.81f;
     public float groundDistance = 0.4f;
-    [SerializeField] private float groundDrag = 10f;
 
     public Transform groundCheck;
     public Transform cameraTransform; 
