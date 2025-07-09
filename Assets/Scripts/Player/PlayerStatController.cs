@@ -34,19 +34,21 @@ public class PlayerStatController : MonoBehaviour
             case StatType.maxHealth:
                 return stats[StatType.maxHealth];
             case StatType.health:
-                return stats[StatType.maxHealth];
+                return stats[StatType.health];
             case StatType.level:
-                return stats[StatType.maxHealth];
+                return stats[StatType.level];
             case StatType.damage:
-                return stats[StatType.maxHealth];
+                return stats[StatType.damage];
             case StatType.crit:
-                return stats[StatType.maxHealth];
+                return stats[StatType.crit];
             case StatType.critDamage:
-                return stats[StatType.maxHealth];
+                return stats[StatType.critDamage];
             case StatType.shootingSpeed:
-                return stats[StatType.maxHealth];
+                return stats[StatType.shootingSpeed];
             case StatType.Speed:
-                return stats[StatType.maxHealth];
+                return stats[StatType.Speed];
+            case StatType.MaxSpeed:
+                return stats[StatType.MaxSpeed]; 
             default:
                 return 0;
         }
@@ -62,7 +64,7 @@ public class PlayerStatController : MonoBehaviour
                 break;
             case StatType.Speed:
                 stats[StatType.Speed] += incrementStats;
-                stats[StatType.MaxSpeed] += incrementPercentageStats;
+                stats[StatType.MaxSpeed] += 50;
                 break;
             case StatType.shootingSpeed:
                 stats[StatType.shootingSpeed] += incrementStats;
@@ -100,8 +102,9 @@ public class PlayerStatController : MonoBehaviour
     public void ResetStats()
     {
         stats[StatType.maxHealth] = 100;
+        stats[StatType.MaxSpeed] = 50;
         stats[StatType.health] = 100;
-        stats[StatType.Speed] = 10;
+        stats[StatType.Speed] = 20;
         stats[StatType.shootingSpeed] = 10;
         stats[StatType.damage] = 10;
         stats[StatType.crit] = 5; //este stat esta en porcentaje
