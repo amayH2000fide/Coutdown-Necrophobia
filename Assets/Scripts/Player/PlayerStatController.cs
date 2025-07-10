@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,12 @@ public class PlayerStatController : MonoBehaviour
     public int incrementPercentageStats;
     public int MaxLevelUp;
 
+    //eventos para UI
+    public event Action<float> OnHealthPercentageChanged;
+    public event Action<int> OnLevelChanged;
+    public event Action<int> OnExperienceChanged;
+
+    public static PlayerStatController Instance { get; private set; }
     public enum StatType
     {
         health,
@@ -24,6 +31,19 @@ public class PlayerStatController : MonoBehaviour
     }
 
     [SerializeField] private Dictionary<StatType, int> stats = new Dictionary<StatType, int>();
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
 
     //para agarrar el stat de aqui por si se necesita para el ui o demas.

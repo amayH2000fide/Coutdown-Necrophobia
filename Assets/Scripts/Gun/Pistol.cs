@@ -6,11 +6,10 @@ public class Pistol : Gun
 {
     void Start()
     {
-        
-    }
-
-    void Update()
-    {
-        
+        DamageMultiplier = 1f;
+        infiniteAmmo = true;
+        fireCooldown = 0.4f;
+        reloadTime = 1.5f;
+        raycastRange = 100f;    
     }
 }
