@@ -12,40 +12,59 @@ public class MovementController : MonoBehaviour
     private Vector2 inputMovement;
     private Vector2 inputMouse;       
     private Vector3 moveDirection;
-    private Vector3 velocity;
     private float xRotation = 0f;
+    public float jumpForce;
     public float gravity = -9.81f;
     public float groundDistance = 0.4f;
 
     public Transform groundCheck;
-    public Transform cameraTransform; 
-
-    public float mouseSensitivity;
+    public Transform cameraTransform;
     public bool isGrounded;
+    public float mouseSensitivity;
+   
+    public bool isSprinting;
+    public bool jumpPressed;
 
+    private Vector3 velocity;
+    public Vector3 CurrentVelocity => velocity;
+    public float CurrentSpeed => new Vector3(velocity.x, 0f, velocity.z).magnitude;
+
+    public bool IsGrounded()
+    {
+        return controller.isGrounded;
+    }
 
     public void GetInputs()
     {
-        inputMovement.x = Input.GetAxis("Horizontal");
-        inputMovement.y = Input.GetAxis("Vertical");
+        inputMovement.x = Input.GetAxisRaw("Horizontal");
+        inputMovement.y = Input.GetAxisRaw("Vertical");
         inputMouse.x = Input.GetAxis("Mouse X");
         inputMouse.y = Input.GetAxis("Mouse Y");
+        isSprinting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        jumpPressed = Input.GetButtonDown("Jump");
+    }
 
+
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck == null) return;
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * 1);
     }
 
     private void GroundCheck()
     {
-        Vector3 start = groundCheck.position + Vector3.up * 0.1f;
-        Vector3 end = groundCheck.position + Vector3.down * 0.1f;
-        float radius = 0.3f;
+        Vector3 origin = groundCheck.position;
+        isGrounded = Physics.Raycast(origin, Vector3.down, 1 , groundMask);
 
-        isGrounded = Physics.CheckCapsule(start, end, radius, groundMask);
-
-        if (isGrounded && velocity.y < 0)
+        if (isGrounded && velocity.y < 0f)
         {
-            velocity.y = -2f;
+            velocity.y = -1f;
         }
     }
+
+
 
     public void MoveCamera()
     {
@@ -57,19 +76,65 @@ public class MovementController : MonoBehaviour
 
     public void MoveSelf()
     {
-        float speed = statController.GetStat(PlayerStatController.StatType.Speed);
-        Vector3 move = moveDirection * speed;
-        velocity.y += gravity * Time.deltaTime;
-        Vector3 finalMove = move + velocity;
-        velocity = LimitHorizontalVelocity(velocity, statController.GetStat(PlayerStatController.StatType.MaxSpeed));
-        controller.Move(finalMove * Time.deltaTime);
-        ApplyGroundDrag();
+        float acceleration = 5f;
+        float gravity = -9.81f;
+
+        float targetSpeed = GetCurrentSpeed();
+
+        if (moveDirection.sqrMagnitude > 0.01f)
+        {
+            Vector3 targetVelocity = moveDirection.normalized * targetSpeed;
+            velocity.x = Mathf.MoveTowards(velocity.x, targetVelocity.x, acceleration * Time.deltaTime);
+            velocity.z = Mathf.MoveTowards(velocity.z, targetVelocity.z, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            float drag = 10f; // Snappier stopping
+            velocity.x = Mathf.MoveTowards(velocity.x, 0f, drag * Time.deltaTime);
+            velocity.z = Mathf.MoveTowards(velocity.z, 0f, drag * Time.deltaTime);
+        }
+
+        if (isGrounded)
+        {
+            if (jumpPressed)
+            {
+                velocity.y = jumpForce;
+            }
+            else if (velocity.y < 0f)
+            {
+                velocity.y = -1f; 
+            }
+        }
+        else
+        {
+            velocity.y += gravity * Time.deltaTime; 
+        }
+
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    public float GetCurrentSpeed()
+    {
+        float speedStat = statController.GetStat(PlayerStatController.StatType.Speed);
+        float maxSpeed = statController.GetStat(PlayerStatController.StatType.MaxSpeed);
+
+        if (isSprinting)
+        {
+            speedStat = Mathf.Min(speedStat * 2f, 100f);
+            maxSpeed *= 2f;
+        }
+
+        float normalizedSpeed = Mathf.Clamp01(speedStat / 100f);
+        float speed = Mathf.Lerp(speedStat, maxSpeed, Mathf.Pow(normalizedSpeed, 2));
+
+        return speed;
     }
 
     void MoveDirection()
     {
         Vector3 move = transform.right * inputMovement.x + transform.forward * inputMovement.y;
         moveDirection = move.normalized;
+
     }
 
 
@@ -80,32 +145,13 @@ public class MovementController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private Vector3 LimitHorizontalVelocity(Vector3 velocity, float maxSpeed)
-    {
-        Vector3 horizontal = new Vector3(velocity.x, 0f, velocity.z);
-
-        if (horizontal.magnitude > maxSpeed)
-        {
-            horizontal = horizontal.normalized * maxSpeed;
-        }
-
-        return new Vector3(horizontal.x, velocity.y, horizontal.z);
-    }
-
-    private void ApplyGroundDrag()
-    {
-        if (isGrounded && moveDirection == Vector3.zero)
-        {
-            velocity = Vector3.MoveTowards(velocity, Vector3.zero, 1 * Time.deltaTime);
-        }
-    }
 
     void Update()
     {
         GroundCheck();
-        GetInputs();
-        MoveDirection();
-        MoveCamera();
+        GetInputs();      
+        MoveDirection();   
+        MoveCamera();      
         MoveSelf();
     }
 }
