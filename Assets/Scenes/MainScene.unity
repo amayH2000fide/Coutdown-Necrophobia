@@ -748,6 +748,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3889979439810880569, guid: d5fa4c3d73c43f74cb6ee9816cac4c39, type: 3}
+      propertyPath: m_EnableTreeColliders
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3889979439810880582, guid: d5fa4c3d73c43f74cb6ee9816cac4c39, type: 3}
       propertyPath: m_Layer
       value: 3

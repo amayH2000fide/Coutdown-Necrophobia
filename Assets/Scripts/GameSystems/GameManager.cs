@@ -98,6 +98,12 @@ public class GameManager : MonoBehaviour
             gameTimeElapsed += spawnDuration + restDuration;
         }
 
+
+        if (totalGameDurationSeconds <= 0 && isPlayerAlive)
+        {
+            GameWon();
+        }
+
         // Game Over or End logic here
         Debug.Log("Game over! 20 minutes elapsed.");
     }
@@ -141,9 +147,14 @@ public class GameManager : MonoBehaviour
 
     private void PlayerDied()
     {
-        Debug.Log("Player died! Game Over.");
         Time.timeScale = 0f;
         UIOverlayManager.Instance.ShowOverlay("GameOver");
+    }
+
+    private void GameWon()
+    {
+        Time.timeScale = 0f;
+        UIOverlayManager.Instance.ShowOverlay("GameWon");
     }
 
 }
