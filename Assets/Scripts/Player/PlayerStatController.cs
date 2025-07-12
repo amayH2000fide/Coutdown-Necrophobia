@@ -10,9 +10,11 @@ public class PlayerStatController : MonoBehaviour
     public int incrementStats;
     public int incrementPercentageStats;
     public int MaxLevelUp;
+    public Transform spawnPoint;
 
     //eventos para UI
     public event Action<float> OnHealthPercentageChanged;
+    public event Action<int> OnHealthchanged;
     public event Action<int> OnLevelChanged;
     public event Action<int> OnExperienceChanged;
 
@@ -84,7 +86,7 @@ public class PlayerStatController : MonoBehaviour
                 break;
             case StatType.Speed:
                 stats[StatType.Speed] += incrementStats;
-                stats[StatType.MaxSpeed] += 50;
+                stats[StatType.MaxSpeed] += 3;
                 break;
             case StatType.shootingSpeed:
                 stats[StatType.shootingSpeed] += incrementStats;
@@ -122,7 +124,7 @@ public class PlayerStatController : MonoBehaviour
     public void ResetStats()
     {
         stats[StatType.maxHealth] = 100;
-        stats[StatType.MaxSpeed] = 50;
+        stats[StatType.MaxSpeed] = 10;
         stats[StatType.health] = 100;
         stats[StatType.Speed] = 20;
         stats[StatType.shootingSpeed] = 10;
@@ -135,6 +137,7 @@ public class PlayerStatController : MonoBehaviour
     //para bajarle la vida al jugador
     public void DamageTaken(int damage)
     {
+
         int healthReduction = GetStat(StatType.health) - damage;
 
         if (healthReduction < 0)
@@ -143,6 +146,9 @@ public class PlayerStatController : MonoBehaviour
         } else {
             stats[StatType.health] = healthReduction;
         }
+
+        OnHealthchanged?.Invoke(((int)StatType.health));
+        Debug.Log("ataque de zombie vida a:" + healthReduction);
     }
 
 
@@ -162,6 +168,7 @@ public class PlayerStatController : MonoBehaviour
     void Start()
     {
         ResetStats();
+        transform.position = spawnPoint.position;
     }
 
 }

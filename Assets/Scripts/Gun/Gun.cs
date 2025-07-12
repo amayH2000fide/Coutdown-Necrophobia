@@ -46,6 +46,9 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
         if (isReloading) return;
 
         if (Automatic)
@@ -145,11 +148,11 @@ public class Gun : MonoBehaviour
         {
             float finalDamage = GetFinalDamage();
 
-            EnemyTestScript enemy = hit.collider.GetComponent<EnemyTestScript>();
+            Zombie enemy = hit.collider.GetComponentInParent<Zombie>();
 
             if (enemy != null)
             {
-                enemy.TakeDamage(Mathf.RoundToInt(finalDamage));
+                enemy.RecibirDano(Mathf.RoundToInt(finalDamage));
                 Debug.Log("Hit test enemy: " + hit.collider.name);
             }
             else

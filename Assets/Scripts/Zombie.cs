@@ -16,10 +16,18 @@ public class Zombie : MonoBehaviour
     private float tiempoUltimoAtaque = 0f;
     public int danioPorSegundo = 15;
 
+    SpawnZombieScript spawnZombie;
+
+
+    void Awake()
+    {
+        spawnZombie = FindObjectOfType<SpawnZombieScript>();
+    }
+
     void Start()
     {
         ani = GetComponent<Animator>();
-        target = GameObject.Find("Player");
+        target = GameObject.FindWithTag("Player");
     }
 
     public void Comportamiento_Enemigo()
@@ -35,7 +43,7 @@ public class Zombie : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direccion);
         }
 
-        if (distancia <= 1f)
+        if (distancia <= 2f)
         {
             ani.SetBool("run", false);
             ani.SetBool("attack", true);
@@ -43,10 +51,14 @@ public class Zombie : MonoBehaviour
 
             if (Time.time - tiempoUltimoAtaque >= tiempoEntreAtaques)
             {
-                Jugador player = target.GetComponent<Jugador>();
+                PlayerStatController player = target.GetComponent<PlayerStatController>();
                 if (player != null)
                 {
-                    player.RecibirDanio(danioPorSegundo);
+                    player.DamageTaken(danioPorSegundo);
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene componente Jugador");
                 }
 
                 tiempoUltimoAtaque = Time.time;
@@ -87,7 +99,7 @@ public class Zombie : MonoBehaviour
         {
             ani.SetTrigger("die");
         }
-
+        spawnZombie.ZombieDied();
         Destroy(gameObject, 2f);
     }
 

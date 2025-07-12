@@ -3,39 +3,37 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    [SerializeField] private GameObject pauseCanvas;   // Arrastra tu Canvas aquí
+    [SerializeField] private string overlaySceneName = "MenuPausa"; 
+    [SerializeField] private UIOverlayManager uiOverlayManager;
+    public GameObject pauseCanvas;
+    private GameManager gameManager;
 
-    private bool isPaused = false;
-
-    private void Start()
+    private void Awake()
     {
-        SetPause(false);                // Asegura que el juego arranca sin pausa
+        gameManager = GameManager.Instance;
     }
 
-    private void Update()
+    public void Resume()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            TogglePause();
-    }
+        Debug.Log("Resume button clicked");
 
-    // ───── Funciones que llamarás desde los botones ─────
-    public void Resume()          => SetPause(false);
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("GameManager.Instance is null!");
+            return;
+        }
+
+        GameManager.Instance.TogglePause();
+    }
 
     public void LoadMainMenu()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");   // Cambia el nombre si tu escena se llama distinto
-    }
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            Destroy(player);
+        }
 
-    // ───── Lógica interna ─────
-    private void TogglePause()    => SetPause(!isPaused);
-
-    private void SetPause(bool value)
-    {
-        isPaused                = value;
-        pauseCanvas.SetActive(value);     // Muestra/oculta el Canvas
-        Time.timeScale          = value ? 0f : 1f;   // Congela o reanuda el tiempo
-        Cursor.lockState        = value ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible          = value;
+        SceneManager.LoadScene("MainMenu");
     }
 }

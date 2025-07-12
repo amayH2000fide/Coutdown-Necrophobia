@@ -4,14 +4,15 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     [Header("Nombre exacto de la escena de juego")]
-    [SerializeField] private string gameSceneName = "REEMPLAZAR_CON_NIVEL";   // cámbiar al nivel 
+    [SerializeField] private string gameSceneName = "MainScene";
 
     // Botón NEW GAME
     public void PlayGame()
     {
+        Time.timeScale = 1f;
+        GameManager.Instance.isPaused = false;
+        SceneManager.LoadScene("MainScene");
         
-        Time.timeScale = 1f;             
-        SceneManager.LoadScene(gameSceneName);
     }
 
     // Botón QUIT

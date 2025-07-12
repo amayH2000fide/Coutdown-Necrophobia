@@ -36,6 +36,9 @@ public class MovementController : MonoBehaviour
 
     public void GetInputs()
     {
+        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+            return;
+
         inputMovement.x = Input.GetAxisRaw("Horizontal");
         inputMovement.y = Input.GetAxisRaw("Vertical");
         inputMouse.x = Input.GetAxis("Mouse X");
@@ -76,8 +79,9 @@ public class MovementController : MonoBehaviour
 
     public void MoveSelf()
     {
-        float acceleration = 5f;
+        float acceleration = 10f;
         float gravity = -9.81f;
+        isGrounded = controller.isGrounded;
 
         float targetSpeed = GetCurrentSpeed();
 
@@ -127,7 +131,13 @@ public class MovementController : MonoBehaviour
         float normalizedSpeed = Mathf.Clamp01(speedStat / 100f);
         float speed = Mathf.Lerp(speedStat, maxSpeed, Mathf.Pow(normalizedSpeed, 2));
 
+        speed = LimitSpeed(speed, maxSpeed);
         return speed;
+    }
+
+    public float LimitSpeed(float speed, float maxSpeed)
+    {
+        return Mathf.Min(speed, maxSpeed);
     }
 
     void MoveDirection()

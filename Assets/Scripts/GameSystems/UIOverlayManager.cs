@@ -46,10 +46,12 @@ public class UIOverlayManager : MonoBehaviour
         if (loadedUIScenes.Contains(sceneName))
         {
             HideOverlay(sceneName);
+            Cursor.lockState = CursorLockMode.Locked;
         }
         else
         {
             ShowOverlay(sceneName);
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 
