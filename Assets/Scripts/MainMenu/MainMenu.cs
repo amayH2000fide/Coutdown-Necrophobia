@@ -10,7 +10,10 @@ public class MainMenu : MonoBehaviour
     public void PlayGame()
     {
         Time.timeScale = 1f;
-        GameManager.Instance.isPaused = false;
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.isPaused = false;
+
         SceneManager.LoadScene("MainScene");
         
     }
