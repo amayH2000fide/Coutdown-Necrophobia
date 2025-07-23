@@ -494,6 +494,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+
 --- !u!64 &196551207
 MeshCollider:
   m_ObjectHideFlags: 0
