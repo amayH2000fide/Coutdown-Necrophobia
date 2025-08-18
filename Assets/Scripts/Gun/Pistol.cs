@@ -10,6 +10,6 @@ public class Pistol : Gun
         infiniteAmmo = true;
         fireCooldown = 0.4f;
         reloadTime = 1.5f;
-        raycastRange = 100f;    
+        raycastRange = 100f;
     }
 }

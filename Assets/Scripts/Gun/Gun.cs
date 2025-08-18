@@ -7,6 +7,9 @@ using UnityEngine.Events;
 public class Gun : MonoBehaviour
 {
     private PlayerStatController playerStats => PlayerStatController.Instance;
+    [SerializeField] private GunSystem gunManager;
+    public bool CanShoot => !isReloading && CurrentCooldown <= 0f;
+
     public UnityEvent OnGunShoot;
     public float DamageMultiplier;
     [SerializeField]  private int CurrentDamage;
@@ -44,42 +47,6 @@ public class Gun : MonoBehaviour
         currentAmmo = maxAmmo;
     }
 
-    void Update()
-    {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
-            return;
-
-        if (isReloading) return;
-
-        if (Automatic)
-        {
-            if (Input.GetMouseButton(0) && CurrentCooldown <= 0f)
-            {
-                Shoot();
-            }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0) && CurrentCooldown <= 0f)
-            {
-                Shoot();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Reload();
-        }
-
-
-        if(CurrentCooldown <= 0)
-        {
-            CurrentCooldown = 0;
-        }
-
-        CurrentCooldown -= Time.deltaTime;
-    }
-
     public void Shoot()
     {
         if (!infiniteAmmo && currentAmmo <= 0)
@@ -97,11 +64,14 @@ public class Gun : MonoBehaviour
         if (projectilePrefab != null && spawnPoint != null)
         {
             GameObject projectile = Instantiate(projectilePrefab, spawnPoint.position, spawnPoint.rotation);
+            Debug.Log("Instantiated projectile: " + projectile.name);
 
-            Rigidbody rb = projectile.GetComponent<Rigidbody>();
+            Rigidbody rb = projectile.GetComponentInChildren<Rigidbody>();
+
             if (rb != null)
             {
-                rb.AddForce(spawnPoint.forward * launchForce, ForceMode.Impulse);
+                Vector3 direction = raycastOrigin.forward;
+                rb.AddForce(direction * launchForce, ForceMode.Impulse);
             }
 
         }
@@ -110,6 +80,15 @@ public class Gun : MonoBehaviour
         Debug.Log("shoot!!");
         OnGunShoot?.Invoke();
         CurrentCooldown = fireCooldown;
+    }
+
+    public void TickCooldown()
+    {
+        if (CurrentCooldown > 0f)
+            CurrentCooldown -= Time.deltaTime;
+
+        if (CurrentCooldown < 0f)
+            CurrentCooldown = 0f;
     }
 
     public void Reload()
