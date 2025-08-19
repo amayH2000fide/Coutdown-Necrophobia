@@ -83,13 +83,21 @@ public class Gun : MonoBehaviour
             Debug.Log("Instantiated projectile: " + projectile.name);
 
             Rigidbody rb = projectile.GetComponentInChildren<Rigidbody>();
-
             if (rb != null)
             {
                 Vector3 direction = raycastOrigin.forward;
                 rb.AddForce(direction * launchForce, ForceMode.Impulse);
             }
 
+            Grenade grenadeScript = projectile.GetComponent<Grenade>();
+            if (grenadeScript != null)
+            {
+                int finalDamage = Mathf.RoundToInt(GetFinalDamage());
+                int gunLevel = gunManager.GetCurrentGunData().level;
+                float multiplier = DamageMultiplier;
+
+                grenadeScript.SetDamage(finalDamage, gunLevel, multiplier);
+            }
         }
 
         PlayMuzzleFlash();
@@ -130,10 +138,18 @@ public class Gun : MonoBehaviour
 
     public float GetFinalDamage()
     {
-        if (playerStats == null) return 0f;
+        if (playerStats == null || gunManager == null) return 0f;
+
         CurrentDamage = playerStats.GetStat(PlayerStatController.StatType.damage);
-        Debug.Log(CurrentDamage * DamageMultiplier);
-        return CurrentDamage * DamageMultiplier;
+
+        GunSystem.GunData gunData = gunManager.GetCurrentGunData();
+        int gunLevel = gunData != null ? gunData.level : 1;
+
+        float gunLevelMultiplier = 1f + 0.3f * (gunLevel - 1);
+
+        float finalDamage = CurrentDamage * DamageMultiplier * gunLevelMultiplier;
+        Debug.Log($"Gun Level: {gunLevel}, Base Damage: {CurrentDamage}, Final Damage: {finalDamage}");
+        return finalDamage;
     }
 
     public virtual void RaycastShoot()

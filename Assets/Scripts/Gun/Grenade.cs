@@ -7,13 +7,20 @@ public class Grenade : MonoBehaviour
     public float delay = 2f;
     public float explosionRadius = 5f;
     public float explosionForce = 700f;
-    public GameObject explosionEffect;
 
-    private int damage;
 
-    public void SetDamage(int dmg)
+    public GameObject sparks;
+    public GameObject flash;
+
+    private int baseDamage;
+    private int gunLevel = 1;
+    private float damageMultiplier = 1f;
+
+    public void SetDamage(int dmg, int level = 1, float multiplier = 1f)
     {
-        damage = dmg;
+        baseDamage = dmg;
+        gunLevel = level;
+        damageMultiplier = multiplier;
     }
 
     private void Start()
@@ -23,8 +30,14 @@ public class Grenade : MonoBehaviour
 
     void Explode()
     {
-        if (explosionEffect != null)
-            Instantiate(explosionEffect, transform.position, transform.rotation);
+        if (flash != null)
+            Instantiate(flash, transform.position, transform.rotation);
+
+        if (sparks != null)
+            Instantiate(sparks, transform.position, Quaternion.identity);
+
+
+        int finalDamage = Mathf.RoundToInt(baseDamage * damageMultiplier * gunLevel);
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (var nearby in colliders)
@@ -35,7 +48,7 @@ public class Grenade : MonoBehaviour
 
             Zombie enemy = nearby.GetComponent<Zombie>();
             if (enemy != null)
-                enemy.RecibirDano(damage);
+                enemy.RecibirDano(finalDamage);
         }
 
         Destroy(gameObject);

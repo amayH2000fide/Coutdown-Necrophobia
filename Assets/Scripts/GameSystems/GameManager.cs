@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
             int spawned = 0;
             while (spawned < maxZombiesPerHorde)
             {
-                spawnZombie.SpawnZombie(maxZombiesPerHorde);
+                spawnZombie.SpawnZombie(maxZombiesPerHorde); 
                 spawned++;
 
                 yield return new WaitForSeconds(spawnInterval);

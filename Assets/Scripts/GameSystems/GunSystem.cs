@@ -122,7 +122,7 @@ public class GunSystem : MonoBehaviour
     {
         if (index >= 0 && index < guns.Count && guns[index].unlocked)
         {
-            if (guns[index].level < 3) // max level 3
+            if (guns[index].level < 3) 
             {
                 guns[index].level++;
                 Debug.Log($"{guns[index].gunObject.name} upgraded to level {guns[index].level}");
@@ -132,5 +132,11 @@ public class GunSystem : MonoBehaviour
                 Debug.Log($"{guns[index].gunObject.name} is already at max level!");
             }
         }
+    }
+    public GunData GetCurrentGunData()
+    {
+        if (currentGunIndex >= 0 && currentGunIndex < guns.Count)
+            return guns[currentGunIndex];
+        return null;
     }
 }
