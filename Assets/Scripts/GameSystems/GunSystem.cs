@@ -7,6 +7,7 @@ public class GunSystem : MonoBehaviour
     [System.Serializable]
     public class GunData
     {
+        public string name;
         public GameObject gunObject;
         public bool unlocked = false;
         public int level = 0;
@@ -74,6 +75,12 @@ public class GunSystem : MonoBehaviour
         }
     }
 
+    public Gun GetCurrentGunScript()
+    {
+        if (guns.Count == 0) return null;
+        return guns[currentGunIndex].gunObject.GetComponent<Gun>();
+    }
+
     public GameObject GetCurrentGun()
     {
         return guns[currentGunIndex].unlocked ? guns[currentGunIndex].gunObject : null;
@@ -115,9 +122,15 @@ public class GunSystem : MonoBehaviour
     {
         if (index >= 0 && index < guns.Count && guns[index].unlocked)
         {
-            guns[index].level++;
-            Debug.Log($"{guns[index].gunObject.name} upgraded to level {guns[index].level}");
-            // Here you can apply actual upgrade logic (damage, fire rate, etc.)
+            if (guns[index].level < 3) // max level 3
+            {
+                guns[index].level++;
+                Debug.Log($"{guns[index].gunObject.name} upgraded to level {guns[index].level}");
+            }
+            else
+            {
+                Debug.Log($"{guns[index].gunObject.name} is already at max level!");
+            }
         }
     }
 }

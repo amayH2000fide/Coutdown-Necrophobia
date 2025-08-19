@@ -41,20 +41,27 @@ public class LevelUpManager : MonoBehaviour
         List<string> upgradeTexts = new List<string>();
 
         List<GunSystem.GunData> locked = gunSystem.GetLockedGuns();
-        List<GunSystem.GunData> unlocked = gunSystem.GetUnlockedGuns();
+        List<GunSystem.GunData> allUnlocked = gunSystem.GetUnlockedGuns();
+        List<GunSystem.GunData> unlocked = new List<GunSystem.GunData>();
+
+        for (int i = 0; i < allUnlocked.Count; i++)
+        {
+            if (allUnlocked[i].level < 3)
+                unlocked.Add(allUnlocked[i]);
+        }
 
         if (locked.Count > 0)
         {
             GunSystem.GunData w = locked[Random.Range(0, locked.Count)];
             upgradeActions.Add(() => UnlockWeapon(w));
-            upgradeTexts.Add($"Unlock {w.gunObject}");
+            upgradeTexts.Add($"desbloquear {w.name}");
         }
 
         if (unlocked.Count > 0)
         {
             GunSystem.GunData w = unlocked[Random.Range(0, unlocked.Count)];
             upgradeActions.Add(() => UpgradeWeapon(w));
-            upgradeTexts.Add($"Upgrade {w.gunObject}");
+            upgradeTexts.Add($"mejorar {w.name}");
         }
 
         List<PlayerStatController.StatType> statChoices = GetRandomStats(3);
@@ -63,7 +70,7 @@ public class LevelUpManager : MonoBehaviour
             if (upgradeActions.Count >= 3) break;
             PlayerStatController.StatType s = stat;
             upgradeActions.Add(() => UpgradeStat(s));
-            upgradeTexts.Add($"Increase {s}");
+            upgradeTexts.Add($"mejorar {s}");
         }
 
         while (upgradeActions.Count < 3)
@@ -71,7 +78,7 @@ public class LevelUpManager : MonoBehaviour
             PlayerStatController.StatType s = (PlayerStatController.StatType)Random.Range(0,
                 System.Enum.GetValues(typeof(PlayerStatController.StatType)).Length);
             upgradeActions.Add(() => UpgradeStat(s));
-            upgradeTexts.Add($"Increase {s}");
+            upgradeTexts.Add($"mejorar {s}");
         }
 
         for (int i = 0; i < upgradeActions.Count && i < 3; i++)
@@ -117,30 +124,39 @@ public class LevelUpManager : MonoBehaviour
 
     private void UpgradeWeapon(GunSystem.GunData gun)
     {
-        int index = gunSystem.guns.IndexOf(gun); // get the index of this GunData
+        int index = gunSystem.guns.IndexOf(gun); 
         if (index >= 0)
-            gunSystem.UpgradeGun(index); // call the existing method
+            gunSystem.UpgradeGun(index);
         Debug.Log($"Upgraded weapon: {gun.gunObject.name}");
     }
 
     private void UpgradeStat(PlayerStatController.StatType stat)
     {
         playerStats.addstats(stat);
-        Debug.Log($"Increased {stat}");
+        Debug.Log($"mejorar {stat}");
     }
 
     private List<PlayerStatController.StatType> GetRandomStats(int count)
     {
-        List<PlayerStatController.StatType> allStats = new List<PlayerStatController.StatType>(
-            (PlayerStatController.StatType[])System.Enum.GetValues(typeof(PlayerStatController.StatType)));
+
+        List<PlayerStatController.StatType> upgradableStats = new List<PlayerStatController.StatType>
+    {
+        PlayerStatController.StatType.damage,
+        PlayerStatController.StatType.Speed,
+        PlayerStatController.StatType.shootingSpeed,
+        PlayerStatController.StatType.crit,
+        PlayerStatController.StatType.critDamage
+    };
 
         List<PlayerStatController.StatType> selected = new List<PlayerStatController.StatType>();
-        while (selected.Count < count && allStats.Count > 0)
+
+        while (selected.Count < count && upgradableStats.Count > 0)
         {
-            int idx = Random.Range(0, allStats.Count);
-            selected.Add(allStats[idx]);
-            allStats.RemoveAt(idx);
+            int idx = Random.Range(0, upgradableStats.Count);
+            selected.Add(upgradableStats[idx]);
+            upgradableStats.RemoveAt(idx);
         }
+
         return selected;
     }
 }

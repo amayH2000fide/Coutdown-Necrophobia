@@ -6,6 +6,14 @@ using UnityEngine.Events;
 
 public class Gun : MonoBehaviour
 {
+
+    [Header("Shooting Effects")]
+    public ParticleSystem muzzleFlash;
+    public Light flashLight;
+    public AudioClip shootSound;
+
+    private AudioSource audioSource;
+
     private PlayerStatController playerStats => PlayerStatController.Instance;
     [SerializeField] private GunSystem gunManager;
     public bool CanShoot => !isReloading && CurrentCooldown <= 0f;
@@ -45,10 +53,18 @@ public class Gun : MonoBehaviour
     {
         CurrentCooldown = fireCooldown;
         currentAmmo = maxAmmo;
+
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        audioSource.playOnAwake = false;
+        audioSource.clip = shootSound;
     }
 
     public void Shoot()
     {
+        if (!gameObject.activeInHierarchy) return;
+
         if (!infiniteAmmo && currentAmmo <= 0)
         {
             Debug.Log("Out of ammo!");
@@ -75,6 +91,9 @@ public class Gun : MonoBehaviour
             }
 
         }
+
+        PlayMuzzleFlash();
+        PlayShootSound();
 
         RaycastShoot();
         Debug.Log("shoot!!");
@@ -139,5 +158,24 @@ public class Gun : MonoBehaviour
                 Debug.Log("Raycast hit: " + hit.collider.name);
             }
         }
+    }
+
+    private void PlayMuzzleFlash()
+    {
+        if (muzzleFlash != null) muzzleFlash.Play();
+        if (flashLight != null) StartCoroutine(FlashLight());
+    }
+
+    private void PlayShootSound()
+    {
+        if (audioSource != null && shootSound != null)
+            audioSource.PlayOneShot(shootSound);
+    }
+
+    private IEnumerator FlashLight()
+    {
+        flashLight.enabled = true;
+        yield return new WaitForSeconds(0.05f);
+        flashLight.enabled = false;
     }
 }
