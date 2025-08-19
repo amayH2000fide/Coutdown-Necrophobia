@@ -6,13 +6,13 @@ using UnityEngine.Events;
 
 public class Gun : MonoBehaviour
 {
-
     [Header("Shooting Effects")]
     public ParticleSystem muzzleFlash;
     public Light flashLight;
-    public AudioClip shootSound;
 
-    private AudioSource audioSource;
+    [Header("Audio")]
+    public AudioClip shootSound;          
+    private AudioSource audioSource;      
 
     private PlayerStatController playerStats => PlayerStatController.Instance;
     [SerializeField] private GunSystem gunManager;
@@ -20,7 +20,7 @@ public class Gun : MonoBehaviour
 
     public UnityEvent OnGunShoot;
     public float DamageMultiplier;
-    [SerializeField]  private int CurrentDamage;
+    [SerializeField] private int CurrentDamage;
 
     public float fireCooldown;
     [SerializeField] private float CurrentCooldown;
@@ -40,11 +40,10 @@ public class Gun : MonoBehaviour
     public float raycastRange;
     public LayerMask hitMask;
 
-    // granade launcher settings 
+    // grenade launcher settings 
     public GameObject projectilePrefab;
     public Transform spawnPoint;
     public float launchForce;
-
 
     public event Action<int> OnAmmoChanged;
     public event Action<int> maxAmmoChanged;
@@ -54,11 +53,12 @@ public class Gun : MonoBehaviour
         CurrentCooldown = fireCooldown;
         currentAmmo = maxAmmo;
 
+        audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
         audioSource.playOnAwake = false;
-        audioSource.clip = shootSound;
+        audioSource.loop = false;
     }
 
     public void Shoot()
@@ -76,6 +76,10 @@ public class Gun : MonoBehaviour
             currentAmmo--;
             Debug.Log("Ammo left: " + currentAmmo);
         }
+
+        // sonido del disparo (una sola vez)
+        if (audioSource != null && shootSound != null)
+            audioSource.PlayOneShot(shootSound);
 
         if (projectilePrefab != null && spawnPoint != null)
         {
@@ -95,13 +99,11 @@ public class Gun : MonoBehaviour
                 int finalDamage = Mathf.RoundToInt(GetFinalDamage());
                 int gunLevel = gunManager.GetCurrentGunData().level;
                 float multiplier = DamageMultiplier;
-
                 grenadeScript.SetDamage(finalDamage, gunLevel, multiplier);
             }
         }
 
         PlayMuzzleFlash();
-        PlayShootSound();
 
         RaycastShoot();
         Debug.Log("shoot!!");
@@ -113,7 +115,6 @@ public class Gun : MonoBehaviour
     {
         if (CurrentCooldown > 0f)
             CurrentCooldown -= Time.deltaTime;
-
         if (CurrentCooldown < 0f)
             CurrentCooldown = 0f;
     }
@@ -121,9 +122,7 @@ public class Gun : MonoBehaviour
     public void Reload()
     {
         if (!isReloading && currentAmmo < maxAmmo)
-        {
             StartCoroutine(ReloadCoroutine());
-        }
     }
 
     private IEnumerator ReloadCoroutine()
@@ -163,7 +162,6 @@ public class Gun : MonoBehaviour
             float finalDamage = GetFinalDamage();
 
             Zombie enemy = hit.collider.GetComponentInParent<Zombie>();
-
             if (enemy != null)
             {
                 enemy.RecibirDano(Mathf.RoundToInt(finalDamage));
@@ -180,12 +178,6 @@ public class Gun : MonoBehaviour
     {
         if (muzzleFlash != null) muzzleFlash.Play();
         if (flashLight != null) StartCoroutine(FlashLight());
-    }
-
-    private void PlayShootSound()
-    {
-        if (audioSource != null && shootSound != null)
-            audioSource.PlayOneShot(shootSound);
     }
 
     private IEnumerator FlashLight()
