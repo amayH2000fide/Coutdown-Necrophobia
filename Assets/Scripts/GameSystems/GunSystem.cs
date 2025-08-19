@@ -4,59 +4,120 @@ using UnityEngine;
 
 public class GunSystem : MonoBehaviour
 {
-    public GameObject[] guns; 
+    [System.Serializable]
+    public class GunData
+    {
+        public GameObject gunObject;
+        public bool unlocked = false;
+        public int level = 0;
+    }
+
+    public List<GunData> guns = new List<GunData>();
     private int currentGunIndex = 0;
 
     void Start()
     {
-        SelectGun(currentGunIndex);
+        if (guns.Count > 0)
+        {
+            guns[0].unlocked = true;
+            guns[0].level = 1;
+            SelectGun(0);
+        }
     }
 
     void Update()
     {
+        if (guns.Count == 0) return;
+
         float scroll = Input.GetAxis("Mouse ScrollWheel");
 
         if (scroll > 0f)
-        {
             NextGun();
-        }
         else if (scroll < 0f)
-        {
             PreviousGun();
-        }
     }
 
     void NextGun()
     {
-        currentGunIndex = (currentGunIndex + 1) % guns.Length;
+        int startIndex = currentGunIndex;
+        do
+        {
+            currentGunIndex = (currentGunIndex + 1) % guns.Count;
+        } while (!guns[currentGunIndex].unlocked && currentGunIndex != startIndex);
+
         SelectGun(currentGunIndex);
     }
 
     void PreviousGun()
     {
-        currentGunIndex--;
-        if (currentGunIndex < 0)
-            currentGunIndex = guns.Length - 1;
+        int startIndex = currentGunIndex;
+        do
+        {
+            currentGunIndex--;
+            if (currentGunIndex < 0) currentGunIndex = guns.Count - 1;
+        } while (!guns[currentGunIndex].unlocked && currentGunIndex != startIndex);
 
         SelectGun(currentGunIndex);
     }
 
     void SelectGun(int index)
     {
-        for (int i = 0; i < guns.Length; i++)
+        for (int i = 0; i < guns.Count; i++)
         {
-            bool isSelected = (i == index);
+            bool isSelected = (i == index && guns[i].unlocked);
 
-            MeshRenderer mesh = guns[i].GetComponentInChildren<MeshRenderer>();
+            MeshRenderer mesh = guns[i].gunObject.GetComponentInChildren<MeshRenderer>();
             if (mesh != null)
                 mesh.enabled = isSelected;
 
-            guns[i].SetActive(isSelected);
+            guns[i].gunObject.SetActive(isSelected);
         }
     }
 
     public GameObject GetCurrentGun()
     {
-        return guns[currentGunIndex];
+        return guns[currentGunIndex].unlocked ? guns[currentGunIndex].gunObject : null;
+    }
+
+    public List<GunData> GetLockedGuns()
+    {
+        List<GunData> locked = new List<GunData>();
+        for (int i = 0; i < guns.Count; i++)
+        {
+            if (!guns[i].unlocked)
+                locked.Add(guns[i]);
+        }
+        return locked;
+    }
+
+    public List<GunData> GetUnlockedGuns()
+    {
+        List<GunData> unlocked = new List<GunData>();
+        for (int i = 0; i < guns.Count; i++)
+        {
+            if (guns[i].unlocked)
+                unlocked.Add(guns[i]);
+        }
+        return unlocked;
+    }
+
+    public void UnlockGun(int index)
+    {
+        if (index >= 0 && index < guns.Count)
+        {
+            guns[index].unlocked = true;
+            guns[index].level = 1;
+            SelectGun(index);
+        }
+    }
+
+    public void UpgradeGun(int index)
+    {
+        if (index >= 0 && index < guns.Count && guns[index].unlocked)
+        {
+            guns[index].level++;
+            Debug.Log($"{guns[index].gunObject.name} upgraded to level {guns[index].level}");
+            // Here you can apply actual upgrade logic (damage, fire rate, etc.)
+        }
     }
 }
