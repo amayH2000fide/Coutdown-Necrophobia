@@ -28,7 +28,7 @@ public class MovementController : MonoBehaviour
     private Vector3 velocity;
     public Vector3 CurrentVelocity => velocity;
     public float CurrentSpeed => new Vector3(velocity.x, 0f, velocity.z).magnitude;
-
+    public bool canMove = true;
     public bool IsGrounded()
     {
         return controller.isGrounded;
@@ -36,7 +36,9 @@ public class MovementController : MonoBehaviour
 
     public void GetInputs()
     {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
+
+
+        if (!canMove || (GameManager.Instance != null && GameManager.Instance.isPaused))
             return;
 
         inputMovement.x = Input.GetAxisRaw("Horizontal");
@@ -71,6 +73,8 @@ public class MovementController : MonoBehaviour
 
     public void MoveCamera()
     {
+        if (!canMove) return;
+
         xRotation -= inputMouse.y * mouseSensitivity;
         xRotation = Mathf.Clamp(xRotation, -30f, 20f);
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
@@ -79,6 +83,8 @@ public class MovementController : MonoBehaviour
 
     public void MoveSelf()
     {
+        if (!canMove) return;
+
         float acceleration = 10f;
         float gravity = -9.81f;
         isGrounded = controller.isGrounded;

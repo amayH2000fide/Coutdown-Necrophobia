@@ -18,21 +18,25 @@ public class PlayerStatController : MonoBehaviour
     public event Action<int> OnLevelChanged;
     public event Action<int> OnExperienceChanged;
 
-    public static PlayerStatController Instance { get; private set; }
-    public enum StatType
-    {
-        health,
-        damage,
-        Speed,
-        MaxSpeed,
-        shootingSpeed,
-        crit,
-        critDamage,
-        maxHealth,
-        level
-    }
+    public int experience = 0;
+    public int baseXP = 100;
+    public float xpMultiplier = 1.5f;
 
-    [SerializeField] private Dictionary<StatType, int> stats = new Dictionary<StatType, int>();
+    public static PlayerStatController Instance { get; private set; }
+        public enum StatType
+        {
+            health,
+            damage,
+            Speed,
+            MaxSpeed,
+            shootingSpeed,
+            crit,
+            critDamage,
+            maxHealth,
+            level
+        }
+
+        [SerializeField] private Dictionary<StatType, int> stats = new Dictionary<StatType, int>();
 
     private void Awake()
     {
@@ -119,6 +123,11 @@ public class PlayerStatController : MonoBehaviour
         } else {
             Debug.Log("max health levelUp reached");
         }
+
+        if (LevelUpManager.Instance != null)
+        {
+            LevelUpManager.Instance.ShowLevelUp();
+        }
     }
 
     public void ResetStats()
@@ -131,6 +140,7 @@ public class PlayerStatController : MonoBehaviour
         stats[StatType.damage] = 10;
         stats[StatType.crit] = 5; //este stat esta en porcentaje
         stats[StatType.critDamage] = 10; //este stat esta en porcentaje
+        stats[StatType.level] = 1;
     }
 
 
@@ -165,10 +175,41 @@ public class PlayerStatController : MonoBehaviour
         }
     }
 
+    public int ExperienceToLevelUp
+    {
+        get
+        {
+            int currentLevel = stats[StatType.level];
+            return Mathf.RoundToInt(baseXP * Mathf.Pow(xpMultiplier, currentLevel - 1));
+        }
+    }
+
+
+    public void AddExperience(int amount)
+    {
+        experience += amount;
+        OnExperienceChanged?.Invoke(experience);
+
+        while (experience >= ExperienceToLevelUp)
+        {
+            experience -= ExperienceToLevelUp;
+            LevelUp();
+        }
+    }
+
     void Start()
     {
         ResetStats();
         transform.position = spawnPoint.position;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            AddExperience(50);
+            Debug.Log($"Gained 50 XP. Current XP: {experience}/{ExperienceToLevelUp}");
+        }
     }
 
 }

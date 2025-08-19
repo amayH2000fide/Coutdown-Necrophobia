@@ -6,7 +6,18 @@ using UnityEngine.Events;
 
 public class Gun : MonoBehaviour
 {
+
+    [Header("Shooting Effects")]
+    public ParticleSystem muzzleFlash;
+    public Light flashLight;
+    public AudioClip shootSound;
+
+    private AudioSource audioSource;
+
     private PlayerStatController playerStats => PlayerStatController.Instance;
+    [SerializeField] private GunSystem gunManager;
+    public bool CanShoot => !isReloading && CurrentCooldown <= 0f;
+
     public UnityEvent OnGunShoot;
     public float DamageMultiplier;
     [SerializeField]  private int CurrentDamage;
@@ -42,46 +53,18 @@ public class Gun : MonoBehaviour
     {
         CurrentCooldown = fireCooldown;
         currentAmmo = maxAmmo;
-    }
 
-    void Update()
-    {
-        if (GameManager.Instance != null && GameManager.Instance.isPaused)
-            return;
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
 
-        if (isReloading) return;
-
-        if (Automatic)
-        {
-            if (Input.GetMouseButton(0) && CurrentCooldown <= 0f)
-            {
-                Shoot();
-            }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0) && CurrentCooldown <= 0f)
-            {
-                Shoot();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Reload();
-        }
-
-
-        if(CurrentCooldown <= 0)
-        {
-            CurrentCooldown = 0;
-        }
-
-        CurrentCooldown -= Time.deltaTime;
+        audioSource.playOnAwake = false;
+        audioSource.clip = shootSound;
     }
 
     public void Shoot()
     {
+        if (!gameObject.activeInHierarchy) return;
+
         if (!infiniteAmmo && currentAmmo <= 0)
         {
             Debug.Log("Out of ammo!");
@@ -97,19 +80,42 @@ public class Gun : MonoBehaviour
         if (projectilePrefab != null && spawnPoint != null)
         {
             GameObject projectile = Instantiate(projectilePrefab, spawnPoint.position, spawnPoint.rotation);
+            Debug.Log("Instantiated projectile: " + projectile.name);
 
-            Rigidbody rb = projectile.GetComponent<Rigidbody>();
+            Rigidbody rb = projectile.GetComponentInChildren<Rigidbody>();
             if (rb != null)
             {
-                rb.AddForce(spawnPoint.forward * launchForce, ForceMode.Impulse);
+                Vector3 direction = raycastOrigin.forward;
+                rb.AddForce(direction * launchForce, ForceMode.Impulse);
             }
 
+            Grenade grenadeScript = projectile.GetComponent<Grenade>();
+            if (grenadeScript != null)
+            {
+                int finalDamage = Mathf.RoundToInt(GetFinalDamage());
+                int gunLevel = gunManager.GetCurrentGunData().level;
+                float multiplier = DamageMultiplier;
+
+                grenadeScript.SetDamage(finalDamage, gunLevel, multiplier);
+            }
         }
+
+        PlayMuzzleFlash();
+        PlayShootSound();
 
         RaycastShoot();
         Debug.Log("shoot!!");
         OnGunShoot?.Invoke();
         CurrentCooldown = fireCooldown;
+    }
+
+    public void TickCooldown()
+    {
+        if (CurrentCooldown > 0f)
+            CurrentCooldown -= Time.deltaTime;
+
+        if (CurrentCooldown < 0f)
+            CurrentCooldown = 0f;
     }
 
     public void Reload()
@@ -132,10 +138,18 @@ public class Gun : MonoBehaviour
 
     public float GetFinalDamage()
     {
-        if (playerStats == null) return 0f;
+        if (playerStats == null || gunManager == null) return 0f;
+
         CurrentDamage = playerStats.GetStat(PlayerStatController.StatType.damage);
-        Debug.Log(CurrentDamage * DamageMultiplier);
-        return CurrentDamage * DamageMultiplier;
+
+        GunSystem.GunData gunData = gunManager.GetCurrentGunData();
+        int gunLevel = gunData != null ? gunData.level : 1;
+
+        float gunLevelMultiplier = 1f + 0.3f * (gunLevel - 1);
+
+        float finalDamage = CurrentDamage * DamageMultiplier * gunLevelMultiplier;
+        Debug.Log($"Gun Level: {gunLevel}, Base Damage: {CurrentDamage}, Final Damage: {finalDamage}");
+        return finalDamage;
     }
 
     public virtual void RaycastShoot()
@@ -160,5 +174,24 @@ public class Gun : MonoBehaviour
                 Debug.Log("Raycast hit: " + hit.collider.name);
             }
         }
+    }
+
+    private void PlayMuzzleFlash()
+    {
+        if (muzzleFlash != null) muzzleFlash.Play();
+        if (flashLight != null) StartCoroutine(FlashLight());
+    }
+
+    private void PlayShootSound()
+    {
+        if (audioSource != null && shootSound != null)
+            audioSource.PlayOneShot(shootSound);
+    }
+
+    private IEnumerator FlashLight()
+    {
+        flashLight.enabled = true;
+        yield return new WaitForSeconds(0.05f);
+        flashLight.enabled = false;
     }
 }

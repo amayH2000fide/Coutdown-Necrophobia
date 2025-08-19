@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7516357855424049034}
   - component: {fileID: 7516357855424049077}
   - component: {fileID: 7516357855424049076}
+  - component: {fileID: 961976268}
   m_Layer: 0
   m_Name: GameManagers
   m_TagString: Untagged
@@ -47,6 +48,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPaused: 0
+  maxZombiesPerHorde: 10
+  spawnDuration: 60
+  restDuration: 20
+  totalHordes: 10
+  totalGameDurationMinutes: 20
+  isPlayerAlive: 1
 --- !u!114 &7516357855424049077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,3 +78,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e30d436695205a41b0b2dfe2641bebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &961976268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7516357855424049079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3121cfa051a612740bb93b7b38d95fd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelUpPanel: {fileID: 0}
+  optionContainer: {fileID: 0}
+  optionPrefab: {fileID: 684701737045365906, guid: 4231ae3f8ee92684080deb076720f65f, type: 3}
+  crosshair: {fileID: 0}
+  playerStats: {fileID: 0}
+  playerMovement: {fileID: 0}
+  gunSystem: {fileID: 0}
