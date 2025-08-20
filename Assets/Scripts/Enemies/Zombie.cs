@@ -4,19 +4,32 @@ using UnityEngine;
 
 public class Zombie : MonoBehaviour
 {
+    [Header("Vida")]
     public int vida = 200;
     public int vidaMaxima = 200;
 
+    [Header("Refs")]
     public Animator ani;
     public GameObject target;
+
+    [Header("Estado")]
     public bool atacando;
     public bool estaMuerto = false;
 
+    [Header("Ataque")]
     private float tiempoEntreAtaques = 1f;
     private float tiempoUltimoAtaque = 0f;
     public int danioPorSegundo = 15;
 
     private SpawnZombieScript spawnZombie;
+
+    [Header("Loot Prefabs")]
+    public GameObject guaranteedDrop;       
+    public GameObject[] rareDrops;         
+
+    [Header("Loot Drop Chances")]
+    [Range(0f, 1f)] public float rareDropChance1 = 0.1f;
+    [Range(0f, 1f)] public float rareDropChance2 = 0.1f;
 
     void Awake()
     {
@@ -83,7 +96,7 @@ public class Zombie : MonoBehaviour
         if (estaMuerto) return;
 
         vida -= cantidad;
-        Debug.Log($"Zombie recibió {cantidad} de daño. Vida restante: {vida}");
+        Debug.Log($"Zombie recibiÃ³ {cantidad} de daÃ±o. Vida restante: {vida}");
 
         if (vida <= 0)
         {
@@ -97,19 +110,17 @@ public class Zombie : MonoBehaviour
         if (estaMuerto) return;
         estaMuerto = true;
 
+        Debug.Log("Zombie eliminado");
+
         if (ani != null)
         {
             ani.SetBool("attack", false);
             ani.SetBool("run", false);
-
-            ani.SetTrigger("die");
+            ani.SetTrigger("die"); 
         }
 
-        //var col = GetComponent<Collider>();
-       // if (col != null) col.enabled = false;
 
-        Debug.Log("Zombie eliminado");
-
+        DropLoot();
         if (spawnZombie != null)
             spawnZombie.ZombieDied();
 
@@ -118,7 +129,22 @@ public class Zombie : MonoBehaviour
 
     public void Final_Ani()
     {
-        ani.SetBool("attack", false);
+        if (ani != null) ani.SetBool("attack", false);
         atacando = false;
+    }
+
+    private void DropLoot()
+    {
+        if (guaranteedDrop != null)
+            Instantiate(guaranteedDrop, transform.position, Quaternion.identity);
+
+        if (rareDrops != null && rareDrops.Length > 0)
+        {
+            if (rareDrops.Length >= 1 && rareDrops[0] != null && Random.value <= rareDropChance1)
+                Instantiate(rareDrops[0], transform.position, Quaternion.identity);
+
+            if (rareDrops.Length >= 2 && rareDrops[1] != null && Random.value <= rareDropChance2)
+                Instantiate(rareDrops[1], transform.position, Quaternion.identity);
+        }
     }
 }
