@@ -34,19 +34,16 @@ public class Gun : MonoBehaviour
 
     public int maxAmmo;
     public int currentAmmo;
+    public event Action<int, int> OnAmmoChanged;
 
-    // balas
+
     public Transform raycastOrigin;
     public float raycastRange;
     public LayerMask hitMask;
 
-    // grenade launcher settings 
     public GameObject projectilePrefab;
     public Transform spawnPoint;
     public float launchForce;
-
-    public event Action<int> OnAmmoChanged;
-    public event Action<int> maxAmmoChanged;
 
     void Start()
     {
@@ -77,7 +74,6 @@ public class Gun : MonoBehaviour
             Debug.Log("Ammo left: " + currentAmmo);
         }
 
-        // sonido del disparo (una sola vez)
         if (audioSource != null && shootSound != null)
             audioSource.PlayOneShot(shootSound);
 
@@ -108,6 +104,7 @@ public class Gun : MonoBehaviour
         RaycastShoot();
         Debug.Log("shoot!!");
         OnGunShoot?.Invoke();
+        OnAmmoChanged?.Invoke(currentAmmo, maxAmmo);
         CurrentCooldown = fireCooldown;
     }
 
@@ -123,6 +120,7 @@ public class Gun : MonoBehaviour
     {
         if (!isReloading && currentAmmo < maxAmmo)
             StartCoroutine(ReloadCoroutine());
+        OnAmmoChanged?.Invoke(currentAmmo, maxAmmo);
     }
 
     private IEnumerator ReloadCoroutine()

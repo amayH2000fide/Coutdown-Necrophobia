@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     public void StartGame()
     {
         totalGameDurationSeconds = totalGameDurationMinutes * 60f;
@@ -132,13 +133,12 @@ public class GameManager : MonoBehaviour
         StartCoroutine(GameLoop());
     }
 
-    private void CheckPlayerHealth(int health)
+    private void CheckPlayerHealth(int currentHealth, int maxHealth)
     {
         if (!isPlayerAlive) return;
+        int healthFromStats = playerStats.GetStat(PlayerStatController.StatType.health);
 
-        int currentHealth = playerStats.GetStat(PlayerStatController.StatType.health);
-
-        if (currentHealth <= 0)
+        if (healthFromStats <= 0)
         {
             isPlayerAlive = false;
             PlayerDied();

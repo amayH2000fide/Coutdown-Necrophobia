@@ -12,7 +12,7 @@ public class PlayerStatController : MonoBehaviour
     public Transform spawnPoint;
 
     public event Action<float> OnHealthPercentageChanged;
-    public event Action<int> OnHealthchanged;
+    public event Action<int, int> OnHealthchanged;
     public event Action<int> OnLevelChanged;
     public event Action<int> OnExperienceChanged;
 
@@ -107,7 +107,7 @@ public class PlayerStatController : MonoBehaviour
 
     public void LevelUp()
     {
-
+        OnLevelChanged?.Invoke(stats[StatType.level]);
         stats[StatType.level] += 1;
 
         if (stats[StatType.level] < MaxLevelUp) {
@@ -122,18 +122,20 @@ public class PlayerStatController : MonoBehaviour
         {
             LevelUpManager.Instance.ShowLevelUp();
         }
+
+        OnHealthchanged?.Invoke(stats[StatType.health], stats[StatType.maxHealth]);
     }
 
     public void ResetStats()
     {
-        stats[StatType.maxHealth] = 100;
+        stats[StatType.maxHealth] = 150;
         stats[StatType.MaxSpeed] = 10;
-        stats[StatType.health] = 100;
+        stats[StatType.health] = 150;
         stats[StatType.Speed] = 20;
         stats[StatType.shootingSpeed] = 10;
         stats[StatType.damage] = 10;
-        stats[StatType.crit] = 5; //este stat esta en porcentaje
-        stats[StatType.critDamage] = 10; //este stat esta en porcentaje
+        stats[StatType.crit] = 5; 
+        stats[StatType.critDamage] = 10; 
         stats[StatType.level] = 1;
     }
 
@@ -149,7 +151,7 @@ public class PlayerStatController : MonoBehaviour
             stats[StatType.health] = healthReduction;
         }
 
-        OnHealthchanged?.Invoke(((int)StatType.health));
+        OnHealthchanged?.Invoke(stats[StatType.health], stats[StatType.maxHealth]);
         Debug.Log("ataque de zombie vida a:" + healthReduction);
     }
 
@@ -165,6 +167,7 @@ public class PlayerStatController : MonoBehaviour
         } else {
             stats[StatType.health] = HealthSum;
         }
+        OnHealthchanged?.Invoke(stats[StatType.health], stats[StatType.maxHealth]);
     }
 
     public int ExperienceToLevelUp
