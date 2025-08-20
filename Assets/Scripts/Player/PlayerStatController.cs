@@ -195,6 +195,9 @@ public class PlayerStatController : MonoBehaviour
             experience -= ExperienceToLevelUp;
             LevelUp();
         }
+
+        Console.WriteLine("experience now : " + experience);
+        Console.WriteLine("experience till levelup: " + ExperienceToLevelUp);
     }
 
     void Start()
@@ -202,14 +205,4 @@ public class PlayerStatController : MonoBehaviour
         ResetStats();
         transform.position = spawnPoint.position;
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AddExperience(50);
-            Debug.Log($"Gained 50 XP. Current XP: {experience}/{ExperienceToLevelUp}");
-        }
-    }
-
 }
