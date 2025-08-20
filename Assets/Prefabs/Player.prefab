@@ -16431,10 +16431,10 @@ MonoBehaviour:
   maxAmmo: 0
   currentAmmo: 0
   raycastOrigin: {fileID: 6826754381489714611}
-  raycastRange: 0
+  raycastRange: 100
   hitMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   projectilePrefab: {fileID: 0}
   spawnPoint: {fileID: 0}
   launchForce: 0

@@ -16,18 +16,24 @@ public class Zombie : MonoBehaviour
     private float tiempoUltimoAtaque = 0f;
     public int danioPorSegundo = 15;
 
-    SpawnZombieScript spawnZombie;
-
+    private SpawnZombieScript spawnZombie;
 
     void Awake()
     {
         spawnZombie = FindObjectOfType<SpawnZombieScript>();
+        if (ani == null) ani = GetComponent<Animator>();
     }
 
     void Start()
     {
-        ani = GetComponent<Animator>();
+        if (ani == null) ani = GetComponent<Animator>();
         target = GameObject.FindWithTag("Player");
+        vida = Mathf.Clamp(vida, 0, vidaMaxima);
+    }
+
+    void Update()
+    {
+        Comportamiento_Enemigo();
     }
 
     public void Comportamiento_Enemigo()
@@ -37,11 +43,9 @@ public class Zombie : MonoBehaviour
         float distancia = Vector3.Distance(transform.position, target.transform.position);
 
         Vector3 direccion = target.transform.position - transform.position;
-        direccion.y = 0;
-        if (direccion != Vector3.zero)
-        {
+        direccion.y = 0f;
+        if (direccion.sqrMagnitude > 0.0001f)
             transform.rotation = Quaternion.LookRotation(direccion);
-        }
 
         if (distancia <= 2f)
         {
@@ -51,14 +55,14 @@ public class Zombie : MonoBehaviour
 
             if (Time.time - tiempoUltimoAtaque >= tiempoEntreAtaques)
             {
-                PlayerStatController player = target.GetComponent<PlayerStatController>();
+                var player = target.GetComponent<PlayerStatController>();
                 if (player != null)
                 {
                     player.DamageTaken(danioPorSegundo);
                 }
                 else
                 {
-                    Debug.LogWarning("El objeto no tiene componente Jugador");
+                    Debug.LogWarning("El objeto con tag 'Player' no tiene PlayerStatController.");
                 }
 
                 tiempoUltimoAtaque = Time.time;
@@ -70,7 +74,7 @@ public class Zombie : MonoBehaviour
             ani.SetBool("run", true);
             atacando = false;
 
-            transform.Translate(Vector3.forward * 2 * Time.deltaTime);
+            transform.Translate(Vector3.forward * 2f * Time.deltaTime);
         }
     }
 
@@ -91,26 +95,30 @@ public class Zombie : MonoBehaviour
     void Morir()
     {
         if (estaMuerto) return;
-
         estaMuerto = true;
-        Debug.Log("Zombie eliminado");
 
         if (ani != null)
         {
+            ani.SetBool("attack", false);
+            ani.SetBool("run", false);
+
             ani.SetTrigger("die");
         }
-        spawnZombie.ZombieDied();
-        Destroy(gameObject, 2f);
+
+        //var col = GetComponent<Collider>();
+       // if (col != null) col.enabled = false;
+
+        Debug.Log("Zombie eliminado");
+
+        if (spawnZombie != null)
+            spawnZombie.ZombieDied();
+
+        Destroy(gameObject, 3f);
     }
 
     public void Final_Ani()
     {
         ani.SetBool("attack", false);
         atacando = false;
-    }
-
-    void Update()
-    {
-        Comportamiento_Enemigo();
     }
 }
