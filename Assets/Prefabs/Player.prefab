@@ -15222,7 +15222,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.089
+  m_Volume: 0.108
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -15319,7 +15319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shootClip: {fileID: 8300000, guid: 1fb070bfd8c6bdd4cbc7001497483ba4, type: 3}
-  volume: 1
+  volume: 0.108
   gun: {fileID: 1033952967}
 --- !u!1 &1572521080612436431
 GameObject:
@@ -15458,7 +15458,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.14
+  m_Volume: 0.108
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -15555,7 +15555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shootClip: {fileID: 8300000, guid: 80cdbcde7ad9ae84d8fd044e016c64b6, type: 3}
-  volume: 1
+  volume: 0.108
   gun: {fileID: 1050487303}
 --- !u!1 &2560750498499763126
 GameObject:
@@ -16808,7 +16808,7 @@ MonoBehaviour:
   muzzleFlash: {fileID: 314146029}
   flashLight: {fileID: 1903292865}
   shootSound: {fileID: 0}
-  gunManager: {fileID: 0}
+  gunManager: {fileID: 857614905}
   OnGunShoot:
     m_PersistentCalls:
       m_Calls: []
@@ -16822,10 +16822,10 @@ MonoBehaviour:
   maxAmmo: 0
   currentAmmo: 0
   raycastOrigin: {fileID: 6826754381489714611}
-  raycastRange: 0
+  raycastRange: 100
   hitMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   projectilePrefab: {fileID: 0}
   spawnPoint: {fileID: 0}
   launchForce: 0
