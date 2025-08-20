@@ -6,13 +6,11 @@ using UnityEngine;
 public class PlayerStatController : MonoBehaviour
 {
 
-    //stats para incrementar por level up o bonus
     public int incrementStats;
     public int incrementPercentageStats;
     public int MaxLevelUp;
     public Transform spawnPoint;
 
-    //eventos para UI
     public event Action<float> OnHealthPercentageChanged;
     public event Action<int> OnHealthchanged;
     public event Action<int> OnLevelChanged;

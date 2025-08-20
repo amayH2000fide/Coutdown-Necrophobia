@@ -175,6 +175,22 @@ PrefabInstance:
       propertyPath: vidaMaxima
       value: 3200
       objectReference: {fileID: 0}
+    - target: {fileID: 4280160241912203067, guid: 2564cafd141bf3d46ad5bcea044842b2, type: 3}
+      propertyPath: guaranteedDrop
+      value: 
+      objectReference: {fileID: 31212300038116709, guid: 111c1abd8e682ea468680eeacd14fe06, type: 3}
+    - target: {fileID: 4280160241912203067, guid: 2564cafd141bf3d46ad5bcea044842b2, type: 3}
+      propertyPath: rareDrops.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4280160241912203067, guid: 2564cafd141bf3d46ad5bcea044842b2, type: 3}
+      propertyPath: rareDrops.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100112701901747518, guid: f3e1f0077471600429335ba8106be33e, type: 3}
+    - target: {fileID: 4280160241912203067, guid: 2564cafd141bf3d46ad5bcea044842b2, type: 3}
+      propertyPath: rareDrops.Array.data[1]
+      value: 
+      objectReference: {fileID: 7681500037205915700, guid: 40f5450310b76404eb9df25f866c4a7c, type: 3}
     - target: {fileID: 4369345637499879782, guid: 2564cafd141bf3d46ad5bcea044842b2, type: 3}
       propertyPath: m_RootOrder
       value: 0
