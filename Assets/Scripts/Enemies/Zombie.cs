@@ -18,6 +18,14 @@ public class Zombie : MonoBehaviour
 
     SpawnZombieScript spawnZombie;
 
+    [Header("Loot Prefabs")]
+    public GameObject guaranteedDrop;   
+    public GameObject[] rareDrops;
+
+
+    [Header("Loot Drop Chances")]
+    [Range(0f, 1f)] public float rareDropChance1 = 0.1f; 
+    [Range(0f, 1f)] public float rareDropChance2 = 0.1f; 
 
     void Awake()
     {
@@ -90,6 +98,7 @@ public class Zombie : MonoBehaviour
 
     void Morir()
     {
+        DropLoot();
         if (estaMuerto) return;
 
         estaMuerto = true;
@@ -112,5 +121,27 @@ public class Zombie : MonoBehaviour
     void Update()
     {
         Comportamiento_Enemigo();
+    }
+
+    private void DropLoot()
+    {
+
+        if (guaranteedDrop != null)
+        {
+            Instantiate(guaranteedDrop, transform.position, Quaternion.identity);
+        }
+
+        if (rareDrops.Length > 0)
+        {
+            if (rareDrops.Length >= 1 && Random.value <= rareDropChance1)
+            {
+                Instantiate(rareDrops[0], transform.position, Quaternion.identity);
+            }
+
+            if (rareDrops.Length >= 2 && Random.value <= rareDropChance2)
+            {
+                Instantiate(rareDrops[1], transform.position, Quaternion.identity);
+            }
+        }
     }
 }
