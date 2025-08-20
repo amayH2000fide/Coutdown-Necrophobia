@@ -98,8 +98,8 @@ public class Zombie : MonoBehaviour
 
     void Morir()
     {
-        DropLoot();
         if (estaMuerto) return;
+        DropLoot();
 
         estaMuerto = true;
         Debug.Log("Zombie eliminado");

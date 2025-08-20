@@ -51,8 +51,6 @@ public class PlayerStatController : MonoBehaviour
         }
     }
 
-
-    //para agarrar el stat de aqui por si se necesita para el ui o demas.
     public int GetStat(StatType stat)
     {
         switch (stat)
@@ -80,7 +78,6 @@ public class PlayerStatController : MonoBehaviour
         }
     }
 
-    //para los bonuses de level up para stats, automaticamente agrega los stats
     public void addstats(StatType stat)
     {
         switch (stat)
@@ -110,7 +107,6 @@ public class PlayerStatController : MonoBehaviour
         };
     }
 
-    //sube el nivel del jugador y le mulptiplica la vida, puede subir de nivel mas de del max level up, pero no le sube la vida.
     public void LevelUp()
     {
 
@@ -143,8 +139,6 @@ public class PlayerStatController : MonoBehaviour
         stats[StatType.level] = 1;
     }
 
-
-    //para bajarle la vida al jugador
     public void DamageTaken(int damage)
     {
 
